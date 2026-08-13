@@ -2,7 +2,7 @@
 
 A lightweight [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) server that provides AI vision analysis capabilities. Analyze images using Google's Gemini models via [OpenRouter](https://openrouter.ai/).
 
-**Works with:** Claude Desktop, Cursor, Pi Agent, Windsurf, Cline, and any MCP-compatible client.
+**Works with:** Claude Desktop, Claude Code CLI, Antigravity, Cursor, Pi Agent, Windsurf, Cline, VS Code, and any MCP-compatible client.
 
 ---
 
@@ -86,12 +86,81 @@ cp .env.example .env
 }
 ```
 
+#### Claude Code CLI
+
+```bash
+# Option 1: Using the CLI command
+claude mcp add vision-analyze \
+  -e OPENROUTER_API_KEY=sk-or-v1-your-key-here \
+  -- node /absolute/path/to/mcp-vision-analyze/index.js
+
+# Option 2: Using JSON config
+claude mcp add-json vision-analyze '{
+  "command": "node",
+  "args": ["/absolute/path/to/mcp-vision-analyze/index.js"],
+  "env": {
+    "OPENROUTER_API_KEY": "sk-or-v1-your-key-here"
+  }
+}'
+```
+
+Or add to `.mcp.json` in your project root:
+
+```json
+{
+  "mcpServers": {
+    "vision-analyze": {
+      "command": "node",
+      "args": ["/absolute/path/to/mcp-vision-analyze/index.js"],
+      "env": {
+        "OPENROUTER_API_KEY": "sk-or-v1-your-key-here"
+      }
+    }
+  }
+}
+```
+
+#### Antigravity
+
+Add to `~/.config/Antigravity/User/globalStorage/*/mcp.json` or via Antigravity Settings → MCP:
+
+```json
+{
+  "mcpServers": {
+    "vision-analyze": {
+      "command": "node",
+      "args": ["/absolute/path/to/mcp-vision-analyze/index.js"],
+      "env": {
+        "OPENROUTER_API_KEY": "sk-or-v1-your-key-here"
+      }
+    }
+  }
+}
+```
+
 #### Cursor (`.cursor/mcp.json`)
 
 ```json
 {
   "mcpServers": {
     "vision-analyze": {
+      "command": "node",
+      "args": ["/absolute/path/to/mcp-vision-analyze/index.js"],
+      "env": {
+        "OPENROUTER_API_KEY": "sk-or-v1-your-key-here"
+      }
+    }
+  }
+}
+```
+
+#### VS Code (`~/.config/Code/User/mcp.json`)
+
+```json
+{
+  "servers": {
+    "vision-analyze": {
+      "type": "stdio",
       "command": "node",
       "args": ["/absolute/path/to/mcp-vision-analyze/index.js"],
       "env": {
