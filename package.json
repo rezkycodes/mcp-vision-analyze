@@ -1,0 +1,10 @@
+{
+  "name": "vision-analyze-mcp",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "MCP server for image vision analysis via OpenRouter (Gemini)",
+  "main": "index.js",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  }
+}
