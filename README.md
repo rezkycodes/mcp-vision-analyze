@@ -40,16 +40,13 @@ Sign up at [OpenRouter](https://openrouter.ai/) and get your API key from [openr
 ### 2. Install
 
 ```bash
-# Clone the repo
-git clone https://github.com/YOUR_USERNAME/mcp-vision-analyze.git
+# Option A: Use directly with npx (recommended — no install needed)
+npx mcp-vision-analyze
+
+# Option B: Clone and install manually
+git clone https://github.com/rezkycodes/mcp-vision-analyze.git
 cd mcp-vision-analyze
-
-# Install dependencies
 npm install
-
-# Copy env example and add your API key
-cp .env.example .env
-# Edit .env and add your OPENROUTER_API_KEY
 ```
 
 ### 3. Configure Your MCP Client
@@ -60,8 +57,8 @@ cp .env.example .env
 {
   "mcpServers": {
     "vision-analyze": {
-      "command": "node",
-      "args": ["/absolute/path/to/mcp-vision-analyze/index.js"],
+      "command": "npx",
+      "args": ["-y", "mcp-vision-analyze"],
       "env": {
         "OPENROUTER_API_KEY": "sk-or-v1-your-key-here"
       }
@@ -92,12 +89,12 @@ cp .env.example .env
 # Option 1: Using the CLI command
 claude mcp add vision-analyze \
   -e OPENROUTER_API_KEY=sk-or-v1-your-key-here \
-  -- node /absolute/path/to/mcp-vision-analyze/index.js
+  -- npx -y mcp-vision-analyze
 
 # Option 2: Using JSON config
 claude mcp add-json vision-analyze '{
-  "command": "node",
-  "args": ["/absolute/path/to/mcp-vision-analyze/index.js"],
+  "command": "npx",
+  "args": ["-y", "mcp-vision-analyze"],
   "env": {
     "OPENROUTER_API_KEY": "sk-or-v1-your-key-here"
   }
@@ -110,8 +107,8 @@ Or add to `.mcp.json` in your project root:
 {
   "mcpServers": {
     "vision-analyze": {
-      "command": "node",
-      "args": ["/absolute/path/to/mcp-vision-analyze/index.js"],
+      "command": "npx",
+      "args": ["-y", "mcp-vision-analyze"],
       "env": {
         "OPENROUTER_API_KEY": "sk-or-v1-your-key-here"
       }
@@ -122,14 +119,14 @@ Or add to `.mcp.json` in your project root:
 
 #### Antigravity
 
-Add to `~/.config/Antigravity/User/globalStorage/*/mcp.json` or via Antigravity Settings → MCP:
+Add to Antigravity Settings → MCP, or edit `~/.config/Antigravity/User/globalStorage/*/mcp.json`:
 
 ```json
 {
   "mcpServers": {
     "vision-analyze": {
-      "command": "node",
-      "args": ["/absolute/path/to/mcp-vision-analyze/index.js"],
+      "command": "npx",
+      "args": ["-y", "mcp-vision-analyze"],
       "env": {
         "OPENROUTER_API_KEY": "sk-or-v1-your-key-here"
       }
@@ -144,8 +141,8 @@ Add to `~/.config/Antigravity/User/globalStorage/*/mcp.json` or via Antigravity 
 {
   "mcpServers": {
     "vision-analyze": {
-      "command": "node",
-      "args": ["/absolute/path/to/mcp-vision-analyze/index.js"],
+      "command": "npx",
+      "args": ["-y", "mcp-vision-analyze"],
       "env": {
         "OPENROUTER_API_KEY": "sk-or-v1-your-key-here"
       }
@@ -161,8 +158,8 @@ Add to `~/.config/Antigravity/User/globalStorage/*/mcp.json` or via Antigravity 
   "servers": {
     "vision-analyze": {
       "type": "stdio",
-      "command": "node",
-      "args": ["/absolute/path/to/mcp-vision-analyze/index.js"],
+      "command": "npx",
+      "args": ["-y", "mcp-vision-analyze"],
       "env": {
         "OPENROUTER_API_KEY": "sk-or-v1-your-key-here"
       }
@@ -174,8 +171,8 @@ Add to `~/.config/Antigravity/User/globalStorage/*/mcp.json` or via Antigravity 
 #### Cline / Windsurf / Other MCP Clients
 
 Add the server config with:
-- **command:** `node`
-- **args:** `["/path/to/index.js"]`
+- **command:** `npx`
+- **args:** `["-y", "mcp-vision-analyze"]`
 - **env:** `{ "OPENROUTER_API_KEY": "your-key" }`
 
 ---

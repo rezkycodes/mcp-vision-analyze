@@ -1,10 +1,49 @@
 {
-  "name": "vision-analyze-mcp",
+  "name": "mcp-vision-analyze",
   "version": "1.0.0",
+  "description": "MCP server for AI image vision analysis via OpenRouter (Gemini). Analyze screenshots, extract text from images, diagnose errors, and more.",
   "type": "module",
-  "description": "MCP server for image vision analysis via OpenRouter (Gemini)",
   "main": "index.js",
+  "bin": {
+    "mcp-vision-analyze": "./index.js"
+  },
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "vision",
+    "image-analysis",
+    "gemini",
+    "openrouter",
+    "ai",
+    "ocr",
+    "screenshot",
+    "llm",
+    "claude",
+    "cursor"
+  ],
+  "author": "Rezky Codes",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rezkycodes/mcp-vision-analyze"
+  },
+  "bugs": {
+    "url": "https://github.com/rezkycodes/mcp-vision-analyze/issues"
+  },
+  "homepage": "https://github.com/rezkycodes/mcp-vision-analyze#readme",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0"
-  }
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "files": [
+    "index.js",
+    "README.md",
+    "LICENSE",
+    ".env.example"
+  ]
 }
