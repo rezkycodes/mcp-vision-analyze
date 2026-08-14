@@ -1,11 +1,6 @@
 # 🔍 MCP Vision Analyze
 
-A lightweight [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) server for AI image vision analysis. Supports **two providers**:
-
-| Provider | Cost | Rate Limit | Best For |
-|----------|------|------------|----------|
-| **Google AI Studio** | 🆓 **FREE** | 15-30 RPM | **Default — recommended** |
-| **OpenRouter** | ~$0.0001/image | Unlimited | Production, high volume |
+A lightweight [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) server for AI image vision analysis. Powered by **OpenRouter** (Google Gemini, Grok, and more).
 
 **Works with:** Claude Desktop, Claude Code CLI, Antigravity, Cursor, Pi Agent, Windsurf, Cline, VS Code, and any MCP-compatible client.
 
@@ -14,29 +9,36 @@ A lightweight [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) s
 ## ✨ Features
 
 - 🖼️ Analyze images from **local file paths** or **HTTP(S) URLs**
-- 🧠 Powered by **Google Gemini** models (2.5 Flash, 2.5 Flash Lite, etc.)
-- 🆓 **FREE** with Google AI Studio (default) or ~$0.0001/image with OpenRouter
+- 🧠 Powered by **Google Gemini** models via OpenRouter
+- 💰 Ultra cheap — ~**$0.0001** per image (free tier available)
 - 📝 Extract text from screenshots (OCR)
 - 🐛 Diagnose error messages in screenshots
 - 📊 Analyze charts, diagrams, and UI designs
+- 🚀 No rate limits — production ready
 - 🔒 Secure — API keys stay local, never stored externally
-- 🔄 Auto-fallback: use `auto` provider to prefer free Google first
+
+---
+
+## 📦 Pricing (OpenRouter)
+
+| Model | Input | Output | Best For |
+|-------|-------|--------|----------|
+| `google/gemini-2.5-flash-lite` | $0.10/M tokens | $0.40/M tokens | **Default — cheapest** |
+| `google/gemini-3.1-flash-lite` | $0.25/M tokens | $1.50/M tokens | Better quality |
+| `google/gemini-3-flash-preview` | $0.50/M tokens | $3.00/M tokens | Best reasoning |
+| `google/gemini-3.7-flash` | $0.38/M tokens | $1.88/M tokens | Latest model |
+| `x-ai/grok-4.5` | $2.00/M tokens | $6.00/M tokens | Grok vision |
+
+> 💡 1 image analysis ≈ 1,300 input tokens + 150 output tokens ≈ **$0.0001**
+> 💡 Free tier available — no credit card needed to start
 
 ---
 
 ## 🚀 Quick Start
 
-### 1. Get an API Key (pick one)
+### 1. Get an API Key
 
-**Option A — Google AI Studio (FREE):**
-1. Go to [aistudio.google.com/apikey](https://aistudio.google.com/apikey)
-2. Create API key
-3. Free tier: 15-30 requests per minute
-
-**Option B — OpenRouter (cheap):**
-1. Sign up at [openrouter.ai](https://openrouter.ai/)
-2. Get key at [openrouter.ai/keys](https://openrouter.ai/keys)
-3. Add credits (even $1 lasts for ~10,000 images)
+Sign up at [OpenRouter](https://openrouter.ai/) and get your API key from [openrouter.ai/keys](https://openrouter.ai/keys).
 
 ### 2. Install
 
@@ -52,9 +54,7 @@ npm install
 
 ### 3. Configure Your MCP Client
 
-Choose your client below. Set **one or both** API keys in the `env` block.
-
----
+Choose your client below. Set `OPENROUTER_API_KEY` in the `env` block.
 
 #### Claude Desktop (`claude_desktop_config.json`)
 
@@ -65,8 +65,6 @@ Choose your client below. Set **one or both** API keys in the `env` block.
       "command": "npx",
       "args": ["-y", "mcp-vision-analyze"],
       "env": {
-        "VISION_PROVIDER": "auto",
-        "GOOGLE_API_KEY": "your-google-key",
         "OPENROUTER_API_KEY": "sk-or-v1-your-openrouter-key"
       }
     }
@@ -77,18 +75,11 @@ Choose your client below. Set **one or both** API keys in the `env` block.
 #### Claude Code CLI
 
 ```bash
-# Add with both providers (auto-fallback)
 claude mcp add vision-analyze \
-  -e VISION_PROVIDER=auto \
-  -e GOOGLE_API_KEY=your-google-key \
   -e OPENROUTER_API_KEY=sk-or-v1-your-openrouter-key \
   -- npx -y mcp-vision-analyze
 
-# Or add only Google (FREE)
-claude mcp add vision-analyze \
-  -e VISION_PROVIDER=google \
-  -e GOOGLE_API_KEY=your-google-key \
-  -- npx -y mcp-vision-analyze
+# Or add to .mcp.json in your project root
 ```
 
 Or add to `.mcp.json` in your project root:
@@ -100,8 +91,6 @@ Or add to `.mcp.json` in your project root:
       "command": "npx",
       "args": ["-y", "mcp-vision-analyze"],
       "env": {
-        "VISION_PROVIDER": "auto",
-        "GOOGLE_API_KEY": "your-google-key",
         "OPENROUTER_API_KEY": "sk-or-v1-your-openrouter-key"
       }
     }
@@ -111,7 +100,7 @@ Or add to `.mcp.json` in your project root:
 
 #### Antigravity
 
-Add via Settings → MCP, or edit the config file:
+Add via Settings → MCP, or edit `~/.gemini/antigravity/mcp_config.json`:
 
 ```json
 {
@@ -120,8 +109,7 @@ Add via Settings → MCP, or edit the config file:
       "command": "npx",
       "args": ["-y", "mcp-vision-analyze"],
       "env": {
-        "VISION_PROVIDER": "google",
-        "GOOGLE_API_KEY": "your-google-key"
+        "OPENROUTER_API_KEY": "sk-or-v1-your-openrouter-key"
       }
     }
   }
@@ -137,8 +125,6 @@ Add via Settings → MCP, or edit the config file:
     "command": "npx",
     "args": ["-y", "mcp-vision-analyze"],
     "env": {
-      "VISION_PROVIDER": "auto",
-      "GOOGLE_API_KEY": "your-google-key",
       "OPENROUTER_API_KEY": "sk-or-v1-your-openrouter-key"
     },
     "directTools": true
@@ -155,8 +141,7 @@ Add via Settings → MCP, or edit the config file:
       "command": "npx",
       "args": ["-y", "mcp-vision-analyze"],
       "env": {
-        "VISION_PROVIDER": "auto",
-        "GOOGLE_API_KEY": "your-google-key"
+        "OPENROUTER_API_KEY": "sk-or-v1-your-openrouter-key"
       }
     }
   }
@@ -173,9 +158,25 @@ Add via Settings → MCP, or edit the config file:
       "command": "npx",
       "args": ["-y", "mcp-vision-analyze"],
       "env": {
-        "VISION_PROVIDER": "auto",
-        "GOOGLE_API_KEY": "your-google-key"
+        "OPENROUTER_API_KEY": "sk-or-v1-your-openrouter-key"
       }
+    }
+  }
+}
+```
+
+#### OpenCode (`~/.config/opencode/opencode.json`)
+
+```json
+{
+  "mcp": {
+    "vision-analyze": {
+      "type": "local",
+      "command": ["node", "/path/to/index.js"],
+      "environment": {
+        "OPENROUTER_API_KEY": "sk-or-v1-your-openrouter-key"
+      },
+      "enabled": true
     }
   }
 }
@@ -214,24 +215,22 @@ Once configured, the `vision_analyze` tool becomes available:
 }
 ```
 
-### Force a Specific Provider
+### Use a Different Model
 
 ```json
 {
   "image_url": "/path/to/image.png",
   "prompt": "Analyze this chart",
-  "provider": "google",
-  "model": "gemini-2.5-flash"
+  "model": "google/gemini-3-flash-preview"
 }
 ```
 
-### Use Grok Vision (via OpenRouter)
+### Use Grok Vision
 
 ```json
 {
   "image_url": "/path/to/image.png",
   "prompt": "Describe this image",
-  "provider": "openrouter",
   "model": "x-ai/grok-4.5"
 }
 ```
@@ -242,7 +241,7 @@ Once configured, the `vision_analyze` tool becomes available:
 
 ```
 mcp-vision-analyze/
-├── index.js            # MCP server (supports Google + OpenRouter)
+├── index.js            # MCP server (OpenRouter only)
 ├── package.json        # npm metadata
 ├── .env.example        # Config template
 ├── .env                # Your API keys (git-ignored)
@@ -257,41 +256,21 @@ mcp-vision-analyze/
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
-| `VISION_PROVIDER` | No | `google` | Provider: `google`, `openrouter`, or `auto` |
-| `GOOGLE_API_KEY` | One of both | — | Google AI Studio API key (FREE) |
-| `OPENROUTER_API_KEY` | One of both | — | OpenRouter API key (paid) |
-| `GOOGLE_MODEL` | No | `gemini-2.5-flash` | Google model |
+| `VISION_PROVIDER` | No | `openrouter` | Provider (only `openrouter` supported) |
+| `OPENROUTER_API_KEY` | ✅ Yes | — | OpenRouter API key |
 | `OPENROUTER_MODEL` | No | `google/gemini-2.5-flash-lite` | OpenRouter model |
-
-**Provider logic:**
-- `auto` → Use Google if `GOOGLE_API_KEY` is set, else OpenRouter
-- `google` → Force Google AI Studio
-- `openrouter` → Force OpenRouter
 
 ---
 
 ## 📦 Available Models
 
-### Google AI Studio (FREE)
-
-| Model | Speed | Quality |
-|-------|-------|---------|
-| `gemini-2.5-flash` | Fast | ⭐⭐⭐⭐⭐ Best |
-| `gemini-2.5-flash-lite` | Fastest | ⭐⭐⭐⭐ Great |
-| `gemini-2.0-flash` | Fast | ⭐⭐⭐⭐ Good |
-| `gemini-1.5-flash` | Fastest | ⭐⭐⭐ OK |
-
-### OpenRouter (paid)
-
-| Model | Cost (input/output) | Quality |
-|-------|---------------------|---------|
-| `google/gemini-2.5-flash-lite` | $0.10/$0.40 per M | ⭐⭐⭐⭐ Best value |
-| `google/gemini-3-flash-preview` | $0.50/$3.00 per M | ⭐⭐⭐⭐⭐ Best |
-| `google/gemini-3.7-flash` | $0.38/$1.88 per M | ⭐⭐⭐⭐⭐ Latest |
-| `x-ai/grok-4.5` | $2.00/$6.00 per M | ⭐⭐⭐⭐ Grok |
-
-> 💡 With Google AI Studio: **completely FREE** (15-30 RPM limit)
-> 💡 With OpenRouter: ~**$0.0001** per image analysis
+| Model | Cost (input/output per M) | Quality |
+|-------|---------------------------|---------|
+| `google/gemini-2.5-flash-lite` | $0.10 / $0.40 | ⭐⭐⭐⭐ Best value |
+| `google/gemini-3.1-flash-lite` | $0.25 / $1.50 | ⭐⭐⭐⭐ Great |
+| `google/gemini-3-flash-preview` | $0.50 / $3.00 | ⭐⭐⭐⭐⭐ Best |
+| `google/gemini-3.7-flash` | $0.38 / $1.88 | ⭐⭐⭐⭐⭐ Latest |
+| `x-ai/grok-4.5` | $2.00 / $6.00 | ⭐⭐⭐⭐ Grok |
 
 ---
 
@@ -308,19 +287,13 @@ mcp-vision-analyze/
 
 ## ❓ FAQ
 
-### Which provider should I use?
+### How much does it cost?
 
-- **Personal/testing:** Use `google` — it's free!
-- **Production/high-volume:** Use `openrouter` — no rate limits
-- **Both:** Use `auto` — prefers free Google, falls back to OpenRouter
-
-### Is Google AI Studio really free?
-
-Yes! Google offers Gemini API free with rate limits (15-30 requests per minute). Perfect for personal use.
+~$0.0001 per image analysis. Free tier available — no credit card needed.
 
 ### Can I use Grok for vision?
 
-Yes! Via OpenRouter: set `provider: "openrouter"` and `model: "x-ai/grok-4.5"`. Note: Grok is not free on OpenRouter.
+Yes! Set `model: "x-ai/grok-4.5"`. Grok is not free on OpenRouter.
 
 ### Does it work offline?
 
@@ -328,7 +301,7 @@ No. Internet connection required for API calls.
 
 ### Is my image data stored?
 
-No. Images are processed in-memory and sent directly to the API. Nothing is stored on disk.
+No. Images are processed in-memory and sent directly to OpenRouter. Nothing is stored on disk.
 
 ---
 

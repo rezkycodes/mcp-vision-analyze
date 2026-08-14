@@ -1,7 +1,7 @@
 {
   "name": "mcp-vision-analyze",
-  "version": "2.1.0",
-  "description": "MCP server for AI image vision analysis. Supports Google AI Studio (FREE) and OpenRouter (cheap). Analyze screenshots, extract text, diagnose errors.",
+  "version": "3.0.0",
+  "description": "MCP server for AI image vision analysis via OpenRouter (Google Gemini, Grok). Analyze screenshots, extract text, diagnose errors.",
   "type": "module",
   "main": "index.js",
   "bin": {

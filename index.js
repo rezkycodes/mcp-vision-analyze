@@ -1,10 +1,7 @@
 #!/usr/bin/env node
 /**
  * Vision Analyze MCP Server
- * Supports TWO providers for image analysis:
- *   1. Google AI Studio — FREE (rate limited: 15-30 RPM)
- *   2. OpenRouter — PAID but cheap (~$0.0001/image)
- *
+ * Powered by OpenRouter (Google Gemini, Grok, etc.)
  * Inspired by Hermes vision_analyze tool
  */
 
@@ -34,11 +31,9 @@ if (existsSync(envPath)) {
   }
 }
 
-// --- Provider Config ---
-const PROVIDER = (process.env.VISION_PROVIDER || "google").toLowerCase(); // "google" | "openrouter"
-const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY || "";
+// --- Config ---
+const PROVIDER = (process.env.VISION_PROVIDER || "openrouter").toLowerCase();
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || "";
-const GOOGLE_MODEL = process.env.GOOGLE_MODEL || "gemini-2.5-flash";
 const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || "google/gemini-2.5-flash-lite";
 
 // --- Helpers ---
@@ -105,80 +100,6 @@ async function resolveImageSource(imageUrl) {
   return fileToBase64DataUrl(src);
 }
 
-// --- Google AI Studio Provider ---
-
-async function callGoogleAIStudio(imageData, prompt, model) {
-  if (!GOOGLE_API_KEY) {
-    throw new Error(
-      "GOOGLE_API_KEY not set. Get free key at https://aistudio.google.com/apikey"
-    );
-  }
-
-  const modelName = model || GOOGLE_MODEL;
-  const url =
-    `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${GOOGLE_API_KEY}`;
-
-  const body = {
-    contents: [
-      {
-        parts: [
-          { text: prompt },
-          {
-            inlineData: {
-              mimeType: imageData.mime,
-              data: imageData.base64,
-            },
-          },
-        ],
-      },
-    ],
-    generationConfig: {
-      maxOutputTokens: 4096,
-    },
-  };
-
-  const resp = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
-
-  if (!resp.ok) {
-    const errText = await resp.text().catch(() => "unknown error");
-    // Parse Google error for helpful message
-    let errMsg = `Google AI Studio error ${resp.status}`;
-    try {
-      const errJson = JSON.parse(errText);
-      errMsg += `: ${errJson?.error?.message || errText}`;
-      // Rate limit hint
-      if (resp.status === 429) {
-        errMsg += "\n💡 Rate limit hit. Wait a minute or switch to OpenRouter provider.";
-      }
-    } catch {
-      errMsg += `: ${errText.slice(0, 200)}`;
-    }
-    throw new Error(errMsg);
-  }
-
-  const data = await resp.json();
-  const content =
-    data?.candidates?.[0]?.content?.parts?.[0]?.text || "No analysis returned.";
-  const usage = data?.usageMetadata || {};
-
-  return {
-    success: true,
-    analysis: content,
-    provider: "google-ai-studio",
-    model: modelName,
-    usage: {
-      prompt_tokens: usage.promptTokenCount || 0,
-      completion_tokens: usage.candidatesTokenCount || 0,
-      total_tokens: usage.totalTokenCount || 0,
-    },
-    cost: "FREE",
-  };
-}
-
 // --- OpenRouter Provider ---
 
 async function callOpenRouter(imageData, prompt, model) {
@@ -242,61 +163,19 @@ async function callOpenRouter(imageData, prompt, model) {
   };
 }
 
-// --- Unified Router ---
-
-async function analyzeImage(imageData, prompt, model, provider) {
-  const prov = (provider || PROVIDER).toLowerCase();
-
-  if (prov === "google" || prov === "google-studio" || prov === "gemini") {
-    return callGoogleAIStudio(imageData, prompt, model);
-  }
-
-  if (prov === "openrouter" || prov === "open-router") {
-    return callOpenRouter(imageData, prompt, model);
-  }
-
-  // Auto-detect: prefer Google if key exists, else OpenRouter
-  if (prov === "auto") {
-    if (GOOGLE_API_KEY) return callGoogleAIStudio(imageData, prompt, model);
-    if (OPENROUTER_API_KEY) return callOpenRouter(imageData, prompt, model);
-    throw new Error("No API key set. Set GOOGLE_API_KEY or OPENROUTER_API_KEY in .env");
-  }
-
-  throw new Error(
-    `Unknown provider: "${prov}". Use "google" or "openrouter"`
-  );
-}
-
 // --- MCP Server ---
 
 const server = new Server(
-  { name: "vision-analyze", version: "2.0.0" },
+  { name: "vision-analyze", version: "3.0.0" },
   { capabilities: { tools: {} } }
 );
-
-const availableModels = {
-  google: [
-    "gemini-2.5-flash (FREE, recommended)",
-    "gemini-2.5-flash-lite (FREE, fastest)",
-    "gemini-2.0-flash (FREE)",
-    "gemini-1.5-flash (FREE)",
-  ],
-  openrouter: [
-    "google/gemini-2.5-flash-lite ($0.10/M, cheapest)",
-    "google/gemini-3-flash-preview ($0.50/M, best value)",
-    "google/gemini-3.7-flash ($0.38/M, latest)",
-    "x-ai/grok-4.5 ($2/M, Grok vision)",
-  ],
-};
 
 server.setRequestHandler(ListToolsRequestSchema, async () => ({
   tools: [
     {
       name: "vision_analyze",
       description:
-        "Analyze an image using AI vision. Supports two providers:\n" +
-        '• Google AI Studio (FREE) — set GOOGLE_API_KEY\n' +
-        '• OpenRouter (cheap) — set OPENROUTER_API_KEY\n\n' +
+        "Analyze an image using AI vision via OpenRouter. Supports Google Gemini, Grok, and more.\n\n" +
         "Accepts local file paths or HTTP(S) URLs. Returns detailed text analysis.",
       inputSchema: {
         type: "object",
@@ -314,13 +193,13 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
           model: {
             type: "string",
             description:
-              "Model to use. Google: gemini-2.5-flash, gemini-2.5-flash-lite. OpenRouter: google/gemini-2.5-flash-lite, x-ai/grok-4.5, etc.",
+              "Model to use. OpenRouter: google/gemini-2.5-flash-lite, google/gemini-3-flash-preview, x-ai/grok-4.5, etc.",
           },
           provider: {
             type: "string",
-            enum: ["google", "openrouter", "auto"],
+            enum: ["openrouter"],
             description:
-              'Provider to use. "google" = Google AI Studio (FREE), "openrouter" = OpenRouter (paid), "auto" = prefer Google if key exists. Default: env VISION_PROVIDER',
+              'Provider to use. Only "openrouter" is supported.',
           },
         },
         required: ["image_url", "prompt"],
@@ -366,8 +245,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       // Resolve image
       const imageData = await resolveImageSource(image_url);
 
-      // Call vision API
-      const result = await analyzeImage(imageData, prompt, model, provider);
+      // Call OpenRouter
+      const result = await callOpenRouter(imageData, prompt, model);
 
       return {
         content: [
@@ -400,11 +279,6 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 const transport = new StdioServerTransport();
 await server.connect(transport);
 
-// Log active config
-const activeProvider = PROVIDER === "auto"
-  ? (GOOGLE_API_KEY ? "google-ai-studio" : OPENROUTER_API_KEY ? "openrouter" : "NONE")
-  : PROVIDER;
-console.error(`vision-analyze MCP server v2.0.0 started`);
-console.error(`  Provider: ${activeProvider}`);
-console.error(`  Google API Key: ${GOOGLE_API_KEY ? "✅ set" : "❌ not set"}`);
+console.error(`vision-analyze MCP server v3.0.0 started`);
+console.error(`  Provider: openrouter`);
 console.error(`  OpenRouter API Key: ${OPENROUTER_API_KEY ? "✅ set" : "❌ not set"}`);
