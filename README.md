@@ -4,7 +4,7 @@ A lightweight [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) s
 
 | Provider | Cost | Rate Limit | Best For |
 |----------|------|------------|----------|
-| **Google AI Studio** | 🆓 **FREE** | 15-30 RPM | Personal use, testing |
+| **Google AI Studio** | 🆓 **FREE** | 15-30 RPM | **Default — recommended** |
 | **OpenRouter** | ~$0.0001/image | Unlimited | Production, high volume |
 
 **Works with:** Claude Desktop, Claude Code CLI, Antigravity, Cursor, Pi Agent, Windsurf, Cline, VS Code, and any MCP-compatible client.
@@ -15,7 +15,7 @@ A lightweight [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) s
 
 - 🖼️ Analyze images from **local file paths** or **HTTP(S) URLs**
 - 🧠 Powered by **Google Gemini** models (2.5 Flash, 2.5 Flash Lite, etc.)
-- 💰 **FREE** with Google AI Studio or ~$0.0001/image with OpenRouter
+- 🆓 **FREE** with Google AI Studio (default) or ~$0.0001/image with OpenRouter
 - 📝 Extract text from screenshots (OCR)
 - 🐛 Diagnose error messages in screenshots
 - 📊 Analyze charts, diagrams, and UI designs
@@ -257,7 +257,7 @@ mcp-vision-analyze/
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
-| `VISION_PROVIDER` | No | `auto` | Provider: `google`, `openrouter`, or `auto` |
+| `VISION_PROVIDER` | No | `google` | Provider: `google`, `openrouter`, or `auto` |
 | `GOOGLE_API_KEY` | One of both | — | Google AI Studio API key (FREE) |
 | `OPENROUTER_API_KEY` | One of both | — | OpenRouter API key (paid) |
 | `GOOGLE_MODEL` | No | `gemini-2.5-flash` | Google model |
